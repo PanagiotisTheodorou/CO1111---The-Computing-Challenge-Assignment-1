@@ -12,6 +12,8 @@ async function doList() {
             "<li>" + "<b>" + treasureHuntsArray[i].name + "</b><br/>" + "<i>" + treasureHuntsArray[i].description + "</i><br/>" + "<a href=\"javascript:select(\'" + treasureHuntsArray[i].uuid + "\')\">Start</a>" + "</li>";
     }
     listHtml += "</ul>";
-    // update the DOM with the newly created list
+
     document.getElementById("treasureHunts").innerHTML = listHtml;
 }
+
+

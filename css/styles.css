@@ -69,3 +69,15 @@ footer a {
     text-decoration: none;
     color: grey;
 }
+
+/* css for the main */
+
+main {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    background-color: #ffffff;
+    border: 3px solid dodgerblue ;
+}
