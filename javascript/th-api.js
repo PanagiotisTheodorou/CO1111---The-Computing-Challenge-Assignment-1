@@ -7,13 +7,48 @@ async function doList() {
 
     let treasureHuntsArray = json.treasureHunts;
     let listHtml = "<ul>";
-    for(let i = 0; i < treasureHuntsArray.length; i++) {
+    for (let i = 0; i < treasureHuntsArray.length; i++) {
         listHtml +=
-            "<li>" + "<b>" + treasureHuntsArray[i].name + "</b><br/>" + "<i>" + treasureHuntsArray[i].description + "</i><br/>" + "<a href=\"javascript:select(\'" + treasureHuntsArray[i].uuid + "\')\">Start</a>" + "</li>";
+            `<li><b>${treasureHuntsArray[i].name}</b><br/><i>
+            ${treasureHuntsArray[i].description}</i><br/>
+            <button type='submit' onclick='select("${treasureHuntsArray[i].uuid}");return false'>Start</button></li>
+            `;
     }
     listHtml += "</ul>";
 
     document.getElementById("treasureHunts").innerHTML = listHtml;
 }
 
+let userName;
+
+function select(uuid) {
+    let nameEl = document.getElementById("userName");
+    if (nameEl.value === "") {
+        alert("incorect");
+    } else {
+        sessionStorage.setItem('id', uuid);
+        sessionStorage.setItem('name', nameEl.value);
+        location.href = "hunt.html";
+    }
+}
+
+let id;
+
+async function startSession() {
+    userName = sessionStorage.getItem('name');
+    id =id = sessionStorage.getItem('id');
+    const url = TH_BASE_URL + "start"
+    //get session id from session storage
+    //send session id and name with async await (fetch)
+
+    // const reply = await fetch(url, data={userName, id});
+    const reply = await fetch(`${TH_BASE_URL}start?player=${userName}&app=Team4App&treasure-hunt-id=${id}`);
+    //get reply
+    const json = await reply.json();
+    // const json = await reply.json(url, {
+    //     method: "POST"
+    // });
+    console.log(json);
+    //do accordingly
+}
 
