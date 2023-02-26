@@ -36,7 +36,7 @@ let id;
 
 async function startSession() {
     userName = sessionStorage.getItem('name');
-    id =id = sessionStorage.getItem('id');
+    id = id =sessionStorage.getItem('id');
     const url = TH_BASE_URL + "start"
     //get session id from session storage
     //send session id and name with async await (fetch)
@@ -44,11 +44,20 @@ async function startSession() {
     // const reply = await fetch(url, data={userName, id});
     const reply = await fetch(`${TH_BASE_URL}start?player=${userName}&app=Team4App&treasure-hunt-id=${id}`);
     //get reply
-    const json = await reply.json();
+    const session = await reply.json();
     // const json = await reply.json(url, {
     //     method: "POST"
     // });
-    console.log(json);
+    console.log(session);
+    showQuestions(session);
     //do accordingly
+}
+
+// because i have the n umber of questions i can now make a for loop to go through them all
+async function showQuestions(sessionInfo){
+    const url = TH_BASE_URL + "question";
+    const reply = await fetch(`${url}?player=${userName}&app=Team4App&treasure-hunt-id=${id}`);
+    const question = await reply.json();
+    console.log(question);
 }
 
