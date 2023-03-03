@@ -34,7 +34,6 @@ function select(uuid) {
     }
 }
 
-
 async function startSession() {
     userName = sessionStorage.getItem('name');
     const reply = await fetch(`${TH_BASE_URL}start?player=${userName}&app=Team4App&treasure-hunt-id=${id}`);
