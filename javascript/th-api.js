@@ -1,5 +1,5 @@
 const TH_BASE_URL = "https://codecyprus.org/th/api/"; // the true API base url
-let id;
+let treasureHuntID;
 
 async function doList() {
 
@@ -27,22 +27,24 @@ function select(uuid) {
     if (nameEl.value === "") {
         alert("incorect");
     } else {
-        id = uuid;
-        sessionStorage.setItem('id', uuid);
-        sessionStorage.setItem('name', nameEl.value);
+        treasureHuntID = uuid;
+        sessionStorage.setItem('treasure-hunt-id', uuid);
+        sessionStorage.setItem('player-name', nameEl.value);
+        startSession(uuid, nameEl.value);
         location.href = "hunt.html";
     }
 }
 
-async function startSession() {
-    userName = sessionStorage.getItem('name');
-    const reply = await fetch(`${TH_BASE_URL}start?player=${userName}&app=Team4App&treasure-hunt-id=${id}`);
-    const session = await reply.json();
+async function startSession(treasureHuntID, playerName) {
+    const reply = await fetch(`${TH_BASE_URL}start?player=${playerName}&app=Team4App&treasure-hunt-id=${treasureHuntID}`);
+    const session = await reply.json().session;
+    sessionStorage.setItem('session-id', session);
     console.log(session);
 }
 
 async function showQuestions(){
-    let sessionID = sessionStorage.getItem('id');
+    let sessionID = sessionStorage.getItem('session-id');
+    console.log(sessionID);
     const reply = await fetch(`${TH_BASE_URL}question?session=${sessionID}`);
     const json = await reply.json();
     console.log(json);
