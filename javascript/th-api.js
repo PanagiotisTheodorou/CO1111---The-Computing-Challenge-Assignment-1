@@ -31,15 +31,56 @@ function select(uuid) {
         sessionStorage.setItem('treasure-hunt-id', uuid);
         sessionStorage.setItem('player-name', nameEl.value);
         startSession(uuid, nameEl.value);
-        location.href = "hunt.html";
     }
 }
 
 async function startSession(treasureHuntID, playerName) {
     const reply = await fetch(`${TH_BASE_URL}start?player=${playerName}&app=Team4App&treasure-hunt-id=${treasureHuntID}`);
-    const session = await reply.json().session;
-    sessionStorage.setItem('session-id', session);
-    console.log(session);
+    const json = await reply.json();
+    sessionStorage.setItem('session-id', json.session);
+    console.log(json);
+
+    if(json.status === "OK"){
+        location.href = "hunt.html";
+    }else {
+        alert(json.errorMessages[0]);
+    }
+}
+
+function Questions(reply) {
+    questionElement = document.getElementById("question");
+
+    questionInfo = document.createElement("div");
+    questionInfo.id = "questionInfo";
+    questionInfo.innerHTML = `
+        <p>Question: ${reply.questionText}</p>
+        <br> 
+    `;
+
+    answerElement = document.createElement("div");
+    answerElement.id = "answer";
+    if (reply.questionType === "INTEGER"){
+        answerElement.innerHTML += `
+            <input type="number" required> 
+            <button onclick="idk()"></button>
+        `;
+    }
+
+    questionElement.appendChild(questionInfo);
+    questionElement.appendChild(answerElement);
+}
+
+function idk() {
+    var userAnswer = document.getElementById("answerElement");
+    console.log(userAnswer);
+}
+
+function skipQuestion(reply) {
+    if (reply.canBeSkipped === true) {
+        // skip question
+    } else {
+        alert("Question cannot be skipped");
+    }
 }
 
 async function showQuestions(){
@@ -48,4 +89,5 @@ async function showQuestions(){
     const reply = await fetch(`${TH_BASE_URL}question?session=${sessionID}`);
     const json = await reply.json();
     console.log(json);
+    Questions(json);
 }
