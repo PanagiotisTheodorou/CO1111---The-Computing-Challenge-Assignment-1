@@ -50,37 +50,78 @@ async function startSession(treasureHuntID, playerName) {
 function Questions(reply) {
     questionElement = document.getElementById("question");
 
-    questionInfo = document.createElement("div");
-    questionInfo.id = "questionInfo";
-    questionInfo.innerHTML = `
+    questionElement.innerHTML = `
         <p>Question: ${reply.questionText}</p>
         <br> 
     `;
 
-    answerElement = document.createElement("div");
-    answerElement.id = "answer";
+    answerElement = document.getElementById("answerForm");
+
     if (reply.questionType === "INTEGER"){
-        answerElement.innerHTML += `
-            <input type="number" required> 
-            <button onclick="idk()"></button>
+        answerElement.innerHTML = `
+            <input type="number" name="answer" required> 
+            <button onclick="sendAnswer(); return false" type="submit"></button>
+        `;
+    }
+    if (reply.questionType === "BOOLEAN"){
+        answerElement.innerHTML = `
+            <label>True</label>
+            <input type="radio" name="answer" value="true">
+            <label>False</label>
+            <input type="radio" name="answer" value="false">
+            <button onclick="sendAnswer(); return false" type="submit">send answer</button>
+        `;
+    }
+    if (reply.questionType === "MCQ"){
+        answerElement.innerHTML = `
+            <label>A</label>
+            <input type="radio" name="answer" value="A">
+            <label>B</label>
+            <input type="radio" name="answer" value="B">
+            <label>C</label>
+            <input type="radio" name="answer" value="C">
+            <label>D</label>
+            <input type="radio" name="answer" value="D"> 
+            <button onclick="sendAnswer(); return false" type="submit"></button>
+        `;
+    }
+    if (reply.questionType === "TEXT"){
+        answerElement.innerHTML = `
+            <input type="text" name="answer" required> 
+            <button onclick="sendAnswer(); return false" type="submit"></button>
         `;
     }
 
-    questionElement.appendChild(questionInfo);
-    questionElement.appendChild(answerElement);
+
 }
 
-function idk() {
-    var userAnswer = document.getElementById("answerElement");
-    console.log(userAnswer);
-}
-
-function skipQuestion(reply) {
-    if (reply.canBeSkipped === true) {
-        // skip question
+async function sendAnswer() {
+    let answer = document.answerForm.answer.value;
+    if (answer.length === 0) {
+        alert("gay");
     } else {
+        let sessionID = sessionStorage.getItem('session-id');
+        const reply = await fetch(`${TH_BASE_URL}answer?session=${sessionID}&answer=${answer}`)
+        const json = await reply.json();
+        if(json.status === "OK"){
+            showQuestions();
+        }else {
+            alert(json.errorMessages[0]);
+        }
+    }
+}
+
+function canSkip(reply) {
+    if (reply.canBeSkipped === true) {
+        skipQuestion();
+    }else {
         alert("Question cannot be skipped");
     }
+}
+
+async function skipQuestion() {
+    const reply = await fetch(`${TH_BASE_URL}skip?session=${sessionID}`);
+    const json = await reply.json();
 }
 
 async function showQuestions(){
@@ -88,6 +129,9 @@ async function showQuestions(){
     console.log(sessionID);
     const reply = await fetch(`${TH_BASE_URL}question?session=${sessionID}`);
     const json = await reply.json();
-    console.log(json);
-    Questions(json);
+    if(json.status === "OK"){
+        Questions(json);
+    }else {
+        alert(json.errorMessages[0]);
+    }
 }
