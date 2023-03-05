@@ -60,7 +60,9 @@ function Questions(reply) {
     if (reply.questionType === "INTEGER"){
         answerElement.innerHTML = `
             <input type="number" name="answer" required> 
-            <button onclick="sendAnswer(); return false" type="submit"></button>
+            <br>
+            <p>Submit your answer by clicking the button: </p>
+            <button onclick="sendAnswer(); return false" type="submit">Submit</button>
         `;
     }
     if (reply.questionType === "BOOLEAN"){
@@ -69,7 +71,9 @@ function Questions(reply) {
             <input type="radio" name="answer" value="true">
             <label>False</label>
             <input type="radio" name="answer" value="false">
-            <button onclick="sendAnswer(); return false" type="submit">send answer</button>
+            <br>
+            <p>Submit your answer by clicking the button: </p>
+            <button onclick="sendAnswer(); return false" type="submit">Submit</button>
         `;
     }
     if (reply.questionType === "MCQ"){
@@ -82,23 +86,25 @@ function Questions(reply) {
             <input type="radio" name="answer" value="C">
             <label>D</label>
             <input type="radio" name="answer" value="D"> 
-            <button onclick="sendAnswer(); return false" type="submit"></button>
+            <br>
+            <p>Submit your answer by clicking the button: </p>
+            <button onclick="sendAnswer(); return false" type="submit">Submit</button>
         `;
     }
     if (reply.questionType === "TEXT"){
         answerElement.innerHTML = `
             <input type="text" name="answer" required> 
-            <button onclick="sendAnswer(); return false" type="submit"></button>
+            <br>
+            <p>Submit your answer by clicking the button: </p>
+            <button onclick="sendAnswer(); return false" type="submit">Submit</button>
         `;
     }
-
-
 }
 
 async function sendAnswer() {
     let answer = document.answerForm.answer.value;
     if (answer.length === 0) {
-        alert("gay");
+        alert("Answer is not provided!!!");
     } else {
         let sessionID = sessionStorage.getItem('session-id');
         const reply = await fetch(`${TH_BASE_URL}answer?session=${sessionID}&answer=${answer}`)
@@ -111,18 +117,22 @@ async function sendAnswer() {
     }
 }
 
-function canSkip(reply) {
-    if (reply.canBeSkipped === true) {
+function canSkip() {
+    if (currentQuestion.canBeSkipped === true) {
         skipQuestion();
+        showQuestions();
     }else {
         alert("Question cannot be skipped");
     }
 }
 
 async function skipQuestion() {
+    let sessionID = sessionStorage.getItem('session-id');
     const reply = await fetch(`${TH_BASE_URL}skip?session=${sessionID}`);
     const json = await reply.json();
 }
+
+let currentQuestion;
 
 async function showQuestions(){
     let sessionID = sessionStorage.getItem('session-id');
@@ -130,6 +140,7 @@ async function showQuestions(){
     const reply = await fetch(`${TH_BASE_URL}question?session=${sessionID}`);
     const json = await reply.json();
     if(json.status === "OK"){
+        currentQuestion = json;
         Questions(json);
     }else {
         alert(json.errorMessages[0]);
