@@ -101,13 +101,29 @@ function Questions(reply) {
     }
 }
 
+async function getScore() {
+    let sessionID = sessionStorage.getItem('session-id');
+    const reply = await fetch(`${TH_BASE_URL}score?session=${sessionID}`);
+    const json = await reply.json();
+    console.log(json);
+    displayScore(json.score);
+}
+
+function displayScore(score) {
+    let scoreElement = document.getElementById("score");
+
+    scoreElement.innerHTML = `
+        <p>Score: ${score}</p>
+    `;
+}
+
 async function sendAnswer() {
     let answer = document.answerForm.answer.value;
     if (answer.length === 0) {
         alert("Answer is not provided!!!");
     } else {
         let sessionID = sessionStorage.getItem('session-id');
-        const reply = await fetch(`${TH_BASE_URL}answer?session=${sessionID}&answer=${answer}`)
+        const reply = await fetch(`${TH_BASE_URL}answer?session=${sessionID}&answer=${answer}`);
         const json = await reply.json();
         if(json.status === "OK"){
             showQuestions();
@@ -142,6 +158,7 @@ async function showQuestions(){
     if(json.status === "OK"){
         currentQuestion = json;
         Questions(json);
+        getScore();
     }else {
         alert(json.errorMessages[0]);
     }
