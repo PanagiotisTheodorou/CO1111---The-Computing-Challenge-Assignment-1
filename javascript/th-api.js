@@ -60,16 +60,22 @@ function Questions(reply) {
 
     answerElement = document.getElementById("answerForm");
 
-    if (reply.questionType === "INTEGER"){
+    if (reply.currentQuestionIndex === reply.numOfQuestions) {
         answerElement.innerHTML = `
+        <p>Congratulations, you have reached the end of the hunt</p>
+        `;
+        questionElement.innerHTML = "";
+    }else {
+        if (reply.questionType === "INTEGER") {
+            answerElement.innerHTML = `
             <input type="number" name="answer" required> 
             <br>
             <p>Submit your answer by clicking the button: </p>
             <button onclick="sendAnswer(); return false" type="submit">Submit</button>
         `;
-    }
-    if (reply.questionType === "BOOLEAN"){
-        answerElement.innerHTML = `
+        }
+        if (reply.questionType === "BOOLEAN") {
+            answerElement.innerHTML = `
             <label>True</label>
             <input type="radio" name="answer" value="true">
             <label>False</label>
@@ -78,9 +84,9 @@ function Questions(reply) {
             <p>Submit your answer by clicking the button: </p>
             <button onclick="sendAnswer(); return false" type="submit">Submit</button>
         `;
-    }
-    if (reply.questionType === "MCQ"){
-        answerElement.innerHTML = `
+        }
+        if (reply.questionType === "MCQ") {
+            answerElement.innerHTML = `
             <label>A</label>
             <input type="radio" name="answer" value="A">
             <label>B</label>
@@ -93,14 +99,15 @@ function Questions(reply) {
             <p>Submit your answer by clicking the button: </p>
             <button onclick="sendAnswer(); return false" type="submit">Submit</button>
         `;
-    }
-    if (reply.questionType === "TEXT"){
-        answerElement.innerHTML = `
+        }
+        if (reply.questionType === "TEXT") {
+            answerElement.innerHTML = `
             <input type="text" name="answer" required> 
             <br>
             <p>Submit your answer by clicking the button: </p>
             <button onclick="sendAnswer(); return false" type="submit">Submit</button>
         `;
+        }
     }
 }
 
@@ -177,6 +184,10 @@ async function skipQuestion() {
 let hasStarted = false;
 
 async function showQuestions(){
+    if (document.getElementById("showQuestions").style.display !== "none") {
+        document.getElementById("showQuestions").style.display = "none";
+    }
+
     if (!hasStarted) {
         setInterval(getLocation, 30001);
         hasStarted = true;
