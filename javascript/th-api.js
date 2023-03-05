@@ -136,7 +136,6 @@ async function sendAnswer() {
 function canSkip() {
     if (currentQuestion.canBeSkipped === true) {
         skipQuestion();
-        showQuestions();
     }else {
         alert("Question cannot be skipped");
     }
@@ -146,6 +145,11 @@ async function skipQuestion() {
     let sessionID = sessionStorage.getItem('session-id');
     const reply = await fetch(`${TH_BASE_URL}skip?session=${sessionID}`);
     const json = await reply.json();
+    if (json.status === "OK") {
+        showQuestions();
+    }else {
+        alert("Did not skip");
+    }
 }
 
 let currentQuestion;
