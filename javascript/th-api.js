@@ -1,6 +1,9 @@
 const TH_BASE_URL = "https://codecyprus.org/th/api/"; // the true API base url
 let treasureHuntID;
 
+let currentQuestion;
+
+
 async function doList() {
 
     const reply = await fetch(TH_BASE_URL + "list");
@@ -117,11 +120,30 @@ function displayScore(score) {
     `;
 }
 
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(position => sendPosition(position));
+    }else {
+        alert("Geolocation is not supported by your browser");
+    }
+}
+
+async function sendPosition(position) {
+    let sessionID = sessionStorage.getItem('session-id');
+    const reply = await fetch(`${TH_BASE_URL}location?session=${sessionID}&latitude=${position.coords.latitude}&longitude=${position.coords.longitude}`);
+    const json = await reply.json();
+    console.log(json);
+}
+
 async function sendAnswer() {
     let answer = document.answerForm.answer.value;
     if (answer.length === 0) {
         alert("Answer is not provided!!!");
     } else {
+        if (currentQuestion.requiresLocation === true) {
+            getLocation();
+            console.log("answer");
+        }
         let sessionID = sessionStorage.getItem('session-id');
         const reply = await fetch(`${TH_BASE_URL}answer?session=${sessionID}&answer=${answer}`);
         const json = await reply.json();
@@ -152,9 +174,13 @@ async function skipQuestion() {
     }
 }
 
-let currentQuestion;
+let hasStarted = false;
 
 async function showQuestions(){
+    if (!hasStarted) {
+        setInterval(getLocation, 30001);
+        hasStarted = true;
+    }
     let sessionID = sessionStorage.getItem('session-id');
     console.log(sessionID);
     const reply = await fetch(`${TH_BASE_URL}question?session=${sessionID}`);
