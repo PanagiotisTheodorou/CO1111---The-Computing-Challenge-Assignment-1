@@ -85,3 +85,15 @@ main {
 #showQuestions {
     display: block;
 }
+
+#progressBar {
+    width: 100%;
+    background-color: whitesmoke;
+    border: solid black 1px;
+}
+
+#bar {
+    width: 1%;
+    height: 30px;
+    background-color: greenyellow;
+}

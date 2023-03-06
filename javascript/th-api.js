@@ -2,7 +2,7 @@ const TH_BASE_URL = "https://codecyprus.org/th/api/"; // the true API base url
 let treasureHuntID;
 
 let currentQuestion;
-
+let progress;
 
 async function doList() {
 
@@ -200,7 +200,14 @@ async function showQuestions(){
         currentQuestion = json;
         Questions(json);
         getScore();
+        updateProgressBar(json.currentQuestionIndex, json.numOfQuestions);
     }else {
         alert(json.errorMessages[0]);
     }
+}
+
+function updateProgressBar(current, total) {
+    let progress = document.getElementById("bar");
+    let width = Math.round((current / total) * 100);
+    progress.style.width = width + "%";
 }
