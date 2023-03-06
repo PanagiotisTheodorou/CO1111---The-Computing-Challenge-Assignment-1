@@ -16,14 +16,14 @@
         <div class="header-right">
             <button onclick="canSkip()">Skip</button>
             <button>QR</button>
+            <!--<button onclick="showLeaderboard();return false">Leaderboard</button>-->
         </div>
     </div>
     </div>
 </header>
     <main>
     <button onclick="showQuestions()" id="showQuestions">show questions</button>
-        <div id="question">
-        </div>
+        <div id="question"></div>
         <p>Provide your answer below: </p>
         <form id="answerForm" name="answerForm">
         </form>
@@ -32,6 +32,10 @@
         <div id="progressBar">
             <div id="bar"></div>
         </div>
+        <!--<div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="leaderboard"></div>
+        </div>-->
     </main>
     <footer>
 

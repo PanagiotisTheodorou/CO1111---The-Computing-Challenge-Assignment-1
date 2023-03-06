@@ -32,15 +32,23 @@
     </div>
 
     <h3>Pick your treasure hunt</h3>
-    <br>
+    <div id="treasureHunts">
+    </div>
+    <!--Adding a div for the modal-->
+    <div id="modalForm" class="modal">
 
-    <form>
-        Input team name
-        <input type="text" name="userName" id="userName" value="" required>
-        <div id="treasureHunts">
-            Empty
+        <!-- Modal content - form for treasure hunt -->
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <form>
+                <p>Input Team Name:</p>
+                <input type="text" name="userName" id="userName" value="" required>
+                <button id="startButton" onClick="startSession(); return false">Start</button>
+            </form>
         </div>
-    </form>
+
+    </div>
+
     <script src="/javascript/th-api.js"></script>
 </main>
 

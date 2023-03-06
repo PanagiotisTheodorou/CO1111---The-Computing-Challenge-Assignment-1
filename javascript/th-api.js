@@ -2,7 +2,6 @@ const TH_BASE_URL = "https://codecyprus.org/th/api/"; // the true API base url
 let treasureHuntID;
 
 let currentQuestion;
-let progress;
 
 async function doList() {
 
@@ -15,7 +14,7 @@ async function doList() {
         listHtml +=
             `<li><b>${treasureHuntsArray[i].name}</b><br/><i>
             ${treasureHuntsArray[i].description}</i><br/>
-            <button type='submit' onclick='select("${treasureHuntsArray[i].uuid}");return false'>Start</button></li>
+            <button type='submit' onclick='select("${treasureHuntsArray[i].uuid}");return false'>Select</button></li>
             `;
     }
     listHtml += "</ul>";
@@ -26,26 +25,36 @@ async function doList() {
 let userName;
 
 function select(uuid) {
-    let nameEl = document.getElementById("userName");
-    if (nameEl.value === "") {
-        alert("incorect");
-    } else {
-        treasureHuntID = uuid;
-        sessionStorage.setItem('treasure-hunt-id', uuid);
-        sessionStorage.setItem('player-name', nameEl.value);
-        startSession(uuid, nameEl.value);
+    treasureHuntID = uuid;
+    sessionStorage.setItem('treasure-hunt-id', uuid);
+    modal.style.display = "block";
+}
+
+let modal = document.getElementById("modalForm");
+// Get the <span> element that closes the modal
+let span = document.getElementsByClassName("close")[0];
+// When the user clicks on <span> (x), close the modal
+function closeModal() {
+    modal.style.display = "none";
+}
+// When the user clicks anywhere outside the modal, close it
+window.onclick = function (event) {
+    if (event.target === modal) {
+        modal.style.display = "none";
     }
 }
 
-async function startSession(treasureHuntID, playerName) {
-    const reply = await fetch(`${TH_BASE_URL}start?player=${playerName}&app=Team4App&treasure-hunt-id=${treasureHuntID}`);
+async function startSession() {
+    let nameEl = document.getElementById("userName").value;
+    let treasureID = sessionStorage.getItem('treasure-hunt-id');
+    const reply = await fetch(`${TH_BASE_URL}start?player=${nameEl}&app=Team4App&treasure-hunt-id=${treasureID}`);
     const json = await reply.json();
     sessionStorage.setItem('session-id', json.session);
     console.log(json);
 
-    if(json.status === "OK"){
+    if (json.status === "OK") {
         location.href = "hunt.html";
-    }else {
+    } else {
         alert(json.errorMessages[0]);
     }
 }
@@ -65,7 +74,7 @@ function Questions(reply) {
         <p>Congratulations, you have reached the end of the hunt</p>
         `;
         questionElement.innerHTML = "";
-    }else {
+    } else {
         if (reply.questionType === "INTEGER") {
             answerElement.innerHTML = `
             <input type="number" name="answer" required> 
@@ -130,7 +139,7 @@ function displayScore(score) {
 function getLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(position => sendPosition(position));
-    }else {
+    } else {
         alert("Geolocation is not supported by your browser");
     }
 }
@@ -154,9 +163,9 @@ async function sendAnswer() {
         let sessionID = sessionStorage.getItem('session-id');
         const reply = await fetch(`${TH_BASE_URL}answer?session=${sessionID}&answer=${answer}`);
         const json = await reply.json();
-        if(json.status === "OK"){
+        if (json.status === "OK") {
             showQuestions();
-        }else {
+        } else {
             alert(json.errorMessages[0]);
         }
     }
@@ -165,7 +174,7 @@ async function sendAnswer() {
 function canSkip() {
     if (currentQuestion.canBeSkipped === true) {
         skipQuestion();
-    }else {
+    } else {
         alert("Question cannot be skipped");
     }
 }
@@ -176,18 +185,17 @@ async function skipQuestion() {
     const json = await reply.json();
     if (json.status === "OK") {
         showQuestions();
-    }else {
+    } else {
         alert("Did not skip");
     }
 }
 
 let hasStarted = false;
 
-async function showQuestions(){
+async function showQuestions() {
     if (document.getElementById("showQuestions").style.display !== "none") {
         document.getElementById("showQuestions").style.display = "none";
     }
-
     if (!hasStarted) {
         setInterval(getLocation, 30001);
         hasStarted = true;
@@ -196,12 +204,12 @@ async function showQuestions(){
     console.log(sessionID);
     const reply = await fetch(`${TH_BASE_URL}question?session=${sessionID}`);
     const json = await reply.json();
-    if(json.status === "OK"){
+    if (json.status === "OK") {
         currentQuestion = json;
         Questions(json);
         getScore();
         updateProgressBar(json.currentQuestionIndex, json.numOfQuestions);
-    }else {
+    } else {
         alert(json.errorMessages[0]);
     }
 }
@@ -210,4 +218,26 @@ function updateProgressBar(current, total) {
     let progress = document.getElementById("bar");
     let width = Math.round((current / total) * 100);
     progress.style.width = width + "%";
+}
+
+async function getLeaderboard() {
+    let sessionID = sessionStorage.getItem('session-id');
+    let treasureID = sessionStorage.getItem('treasure-hunt-id');
+    let sorted = true;
+    let limit = 10;
+    const reply = await fetch(`${TH_BASE_URL}leaderboard?session=${sessionID}&sorted=${sorted}&limit=${limit}`);
+    const json = await reply.json();
+    showLeaderboard(json);
+}
+
+function showLeaderboard(reply) {
+    let leaderboard = document.getElementById("leaderboard");
+    leaderboard.innerHTML = `
+        <p>Leaderboard</p>
+    `;
+    for (let i=0; i<reply.limit - 1; i++) {
+        leaderboard.innerHTML += `
+           ${reply.leaderboard.player} - ${reply.leaderboard.score} - ${reply.leaderboard.completionTime}
+    `;
+    }
 }
