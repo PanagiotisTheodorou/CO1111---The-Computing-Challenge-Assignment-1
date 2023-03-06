@@ -16,7 +16,7 @@
         <div class="header-right">
             <button onclick="canSkip()">Skip</button>
             <button>QR</button>
-            <!--<button onclick="showLeaderboard();return false">Leaderboard</button>-->
+            <button onclick="getLeaderboard();return false">Leaderboard</button>
         </div>
     </div>
     </div>
@@ -32,13 +32,14 @@
         <div id="progressBar">
             <div id="bar"></div>
         </div>
-        <!--<div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <div id="leaderboard"></div>
-        </div>-->
+        <div id="modalLeaderboard" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <div id="leaderboard"></div>
+            </div>
+        </div>
     </main>
     <footer>
-
     </footer>
 </body>
 </html>

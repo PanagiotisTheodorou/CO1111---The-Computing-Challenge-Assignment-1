@@ -222,22 +222,29 @@ function updateProgressBar(current, total) {
 
 async function getLeaderboard() {
     let sessionID = sessionStorage.getItem('session-id');
-    let treasureID = sessionStorage.getItem('treasure-hunt-id');
-    let sorted = true;
-    let limit = 10;
-    const reply = await fetch(`${TH_BASE_URL}leaderboard?session=${sessionID}&sorted=${sorted}&limit=${limit}`);
+    const reply = await fetch(`${TH_BASE_URL}leaderboard?session=${sessionID}&sorted=true&limit=10`);
     const json = await reply.json();
-    showLeaderboard(json);
+    if (json.status === "OK") {
+        showLeaderboard(json);
+    }else {
+        alert("error");
+    }
 }
 
 function showLeaderboard(reply) {
     let leaderboard = document.getElementById("leaderboard");
-    leaderboard.innerHTML = `
-        <p>Leaderboard</p>
-    `;
+    let modalLeaderboard = document.getElementById("modalLeaderboard");
     for (let i=0; i<reply.limit - 1; i++) {
         leaderboard.innerHTML += `
-           ${reply.leaderboard.player} - ${reply.leaderboard.score} - ${reply.leaderboard.completionTime}
+           ${reply.leaderboard[i].player} - ${reply.leaderboard[i].score} - ${reply.leaderboard[i].completionTime}
     `;
+    }
+    modalLeaderboard.style.display = "block";
+}
+
+window.onclick = function (event) {
+    let modalLeaderboard = document.getElementById("modalLeaderboard");
+    if (event.target === modalLeaderboard) {
+        modalLeaderboard.style.display = "none";
     }
 }
