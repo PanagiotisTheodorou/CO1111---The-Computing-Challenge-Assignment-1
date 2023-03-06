@@ -50,6 +50,7 @@ async function startSession() {
     const reply = await fetch(`${TH_BASE_URL}start?player=${nameEl}&app=Team4App&treasure-hunt-id=${treasureID}`);
     const json = await reply.json();
     sessionStorage.setItem('session-id', json.session);
+    sessionStorage.setItem('name', nameEl);
     console.log(json);
 
     if (json.status === "OK") {
@@ -220,14 +221,21 @@ function updateProgressBar(current, total) {
     progress.style.width = width + "%";
 }
 
+let calledLeaderboard = true;
+
 async function getLeaderboard() {
-    let sessionID = sessionStorage.getItem('session-id');
-    const reply = await fetch(`${TH_BASE_URL}leaderboard?session=${sessionID}&sorted=true&limit=10`);
-    const json = await reply.json();
-    if (json.status === "OK") {
-        showLeaderboard(json);
+    if (calledLeaderboard === false) {
+        console.log("Already called leaderboard");
     }else {
-        alert("error");
+        let sessionID = sessionStorage.getItem('session-id');
+        const reply = await fetch(`${TH_BASE_URL}leaderboard?session=${sessionID}&sorted=true&limit=10`);
+        const json = await reply.json();
+        if (json.status === "OK") {
+            showLeaderboard(json);
+        }else {
+            alert("error");
+        }
+        calledLeaderboard = false;
     }
 }
 
@@ -237,9 +245,15 @@ function showLeaderboard(reply) {
     for (let i=0; i<reply.limit - 1; i++) {
         leaderboard.innerHTML += `
            ${reply.leaderboard[i].player} - ${reply.leaderboard[i].score} - ${reply.leaderboard[i].completionTime}
+           <br>
     `;
     }
     modalLeaderboard.style.display = "block";
+    let teamName = sessionStorage.getItem('name');
+
+    // pseudo code
+    // if not in the 10 first
+    // display at the bottom
 }
 
 window.onclick = function (event) {
@@ -247,4 +261,9 @@ window.onclick = function (event) {
     if (event.target === modalLeaderboard) {
         modalLeaderboard.style.display = "none";
     }
+}
+
+function closeLeaderboard() {
+    let modalLeaderboard = document.getElementById("modalLeaderboard");
+    modalLeaderboard.style.display = "none";
 }
