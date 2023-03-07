@@ -33,10 +33,12 @@ function select(uuid) {
 let modal = document.getElementById("modalForm");
 // Get the <span> element that closes the modal
 let span = document.getElementsByClassName("close")[0];
+
 // When the user clicks on <span> (x), close the modal
 function closeModal() {
     modal.style.display = "none";
 }
+
 // When the user clicks anywhere outside the modal, close it
 window.onclick = function (event) {
     if (event.target === modal) {
@@ -224,29 +226,29 @@ function updateProgressBar(current, total) {
 let calledLeaderboard = true;
 
 async function getLeaderboard() {
-    if (calledLeaderboard === false) {
-        console.log("Already called leaderboard");
-    }else {
-        let sessionID = sessionStorage.getItem('session-id');
-        const reply = await fetch(`${TH_BASE_URL}leaderboard?session=${sessionID}&sorted=true&limit=10`);
-        const json = await reply.json();
-        if (json.status === "OK") {
-            showLeaderboard(json);
-        }else {
-            alert("error");
-        }
-        calledLeaderboard = false;
+
+    let sessionID = sessionStorage.getItem('session-id');
+    const reply = await fetch(`${TH_BASE_URL}leaderboard?session=${sessionID}&sorted=true&limit=10`);
+    const json = await reply.json();
+    if (json.status === "OK") {
+        showLeaderboard(json);
+    } else {
+        alert("error");
     }
+
 }
 
 function showLeaderboard(reply) {
     let leaderboard = document.getElementById("leaderboard");
     let modalLeaderboard = document.getElementById("modalLeaderboard");
-    for (let i=0; i<reply.limit - 1; i++) {
-        leaderboard.innerHTML += `
+    if (calledLeaderboard === true) {
+        for (let i = 0; i < reply.limit - 1; i++) {
+            leaderboard.innerHTML += `
            ${reply.leaderboard[i].player} - ${reply.leaderboard[i].score} - ${reply.leaderboard[i].completionTime}
            <br>
     `;
+        }
+        calledLeaderboard = false;
     }
     modalLeaderboard.style.display = "block";
     let teamName = sessionStorage.getItem('name');
